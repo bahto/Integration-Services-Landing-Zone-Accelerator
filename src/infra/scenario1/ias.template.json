@@ -12,7 +12,7 @@
         "environment": {
             "type": "string",
             "defaultValue": "dev",
-            "allowedValues": [ "dev", "uat", "prod" ],
+            "allowedValues": [ "dev", "tst", "acc", "prd" ],
             "metadata": {
                 "description": "Type of environment"
             }
