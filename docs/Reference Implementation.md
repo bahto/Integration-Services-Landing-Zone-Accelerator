@@ -3,7 +3,7 @@
 All code and templates for the reference implementation (including the
 *Deploy to Azure* sample) can be found here:
 
-<https://github.com/Azure/Integration-Services-Landing-Zone-Accelerator/tree/main/src/infra>
+<https://github.com/bahto/Integration-Services-Landing-Zone-Accelerator/tree/main/src/infra>
 
 Following the guidance in the earlier sections of this guide, we have
 prepared a series of deployment templates, which will deploy all the
