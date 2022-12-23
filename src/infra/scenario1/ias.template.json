@@ -125,7 +125,7 @@
                 "address": "[parameters('frontEndSubnet')]"
             },
             "backEnd": {
-                "name": "[concat('snet-',parameters('systemPrefix'),'-backend-',parameters('environment')]",
+                "name": "[concat('snet-',parameters('systemPrefix'),'-backend-',parameters('environment'))]",
                 "nsg": "[concat('nsg-',parameters('systemPrefix'),'-backend-',parameters('environment'))]",
                 "address": "[parameters('backEndSubnet')]"
             },
