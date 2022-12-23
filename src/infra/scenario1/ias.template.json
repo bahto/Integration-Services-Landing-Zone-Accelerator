@@ -78,7 +78,7 @@
         "nameSuffix": "[concat('-',parameters('systemPrefix'),'-',parameters('environment'))]",
         
         "storage": {
-            "name": "[concat('stg',variables('platform').systemPrefix, variables('platform').environment,'-',uniqueString(resourceGroup().id))]"
+            "name": "[concat('stg',variables('platform').systemPrefix, variables('platform').environment,uniqueString(resourceGroup().id))]"
         },
         "logicApp": {
             "name": "[concat('logic',variables('nameSuffix'))]"
