@@ -38,17 +38,17 @@
         }, 
         {
             "location": "[parameters('platform').region]",
-            "name": "[concat('pep-',parameters('platform').systemPrefix,'-df-',parameters('platform').environment,'-',parameters('platform').region,'-01')]",
+            "name": "[concat('pep-',parameters('platform').systemPrefix,'-df-',parameters('platform').environment)]",
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "2021-05-01",
             "properties": {
                 "subnet": {
                     "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('vnet').name, parameters('vnet').privateLink.name)]"
                 },
-                "customNetworkInterfaceName": "[concat('nic-',parameters('platform').systemPrefix,'-df-',parameters('platform').environment,'-',parameters('platform').region,'-01')]",
+                "customNetworkInterfaceName": "[concat('nic-',parameters('platform').systemPrefix,'-df-',parameters('platform').environment)]",
                 "privateLinkServiceConnections": [
                     {
-                        "name": "[concat('pep-',parameters('platform').systemPrefix,'-df-',parameters('platform').environment,'-',parameters('platform').region,'-01')]",
+                        "name": "[concat('pep-',parameters('platform').systemPrefix,'-df-',parameters('platform').environment)]",
                         "properties": {
                             "privateLinkServiceId": "[resourceId('Microsoft.DataFactory/factories',parameters('dataFactory').name)]",
                             "groupIds": [ "dataFactory" ]
@@ -70,7 +70,7 @@
             "tags": {},
             "properties": {},
             "dependsOn": [
-                "[concat('pep-',parameters('platform').systemPrefix,'-df-',parameters('platform').environment,'-',parameters('platform').region,'-01')]"
+                "[concat('pep-',parameters('platform').systemPrefix,'-df-',parameters('platform').environment)]"
             ]
 
         }

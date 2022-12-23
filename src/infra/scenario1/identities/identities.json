@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "environment": {
+            "type": "string"
+        },
+        "identifierSuffix":{
+            "type": "string",
+            "defaultValue": "01"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "name": "[concat('uami-','ais','-logicapp-',parameters('environment'),parameters('identifierSuffix'))]",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "name": "[concat('uami-','ais','-apim-',parameters('environment'),parameters('identifierSuffix'))]",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "name": "[concat('uami-','ais','-kkeyvault-',parameters('environment'),parameters('identifierSuffix'))]",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "name": "[concat('uami-','ais','-servicebus-',parameters('environment'),parameters('identifierSuffix'))]",
+            "location": "[parameters('location')]"
+        },
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "name": "[concat('uami-','ais','-functionapp-',parameters('environment'),parameters('identifierSuffix'))]",
+            "location": "[parameters('location')]"
+        }
+    ]
+}

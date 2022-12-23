@@ -21,7 +21,7 @@
     },
     "variables": {
 
-        "hostingPlanName": "[concat('plan-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment,'-',parameters('platform').region,'-01')]"
+        "hostingPlanName": "[concat('plan-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment)]"
     },
     "resources": [
         // Plan
@@ -29,7 +29,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2022-03-01",
             "name": "[variables('hostingPlanName')]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('platform').region]",
             "sku": {
                 "name": "EP1",
                 "tier": "ElasticPremium",
@@ -55,7 +55,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2021-02-01",
             "name": "[parameters('funcApp').name]",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('platform').region]",
             "kind": "functionapp",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
@@ -103,17 +103,17 @@
         },
         {
             "location": "[parameters('platform').region]",
-            "name": "[concat('pep-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment,'-',parameters('platform').region,'-01')]",
+            "name": "[concat('pep-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment)]",
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "2021-05-01",
             "properties": {
                 "subnet": {
                     "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('vnet').name, parameters('vnet').privateLink.name)]"
                 },
-                "customNetworkInterfaceName": "[concat('nic-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment,'-',parameters('platform').region,'-01')]",
+                "customNetworkInterfaceName": "[concat('nic-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment)]",
                 "privateLinkServiceConnections": [
                     {
-                        "name": "[concat('pep-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment,'-',parameters('platform').region,'-01')]",
+                        "name": "[concat('pep-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment)]",
                         "properties": {
                             "privateLinkServiceId": "[resourceId('Microsoft.Web/sites',parameters('funcApp').name)]",
                             "groupIds": [ "sites" ]
@@ -135,7 +135,7 @@
             "tags": {},
             "properties": {},
             "dependsOn": [
-                "[concat('pep-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment,'-',parameters('platform').region,'-01')]"
+                "[concat('pep-',parameters('platform').systemPrefix,'-func-',parameters('platform').environment)]"
             ]
 
         },

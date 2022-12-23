@@ -11,17 +11,15 @@
         "platform": {
             "type": "object"
         }
-
     },
     "variables": {
-        "pepName": "[concat('pep-',parameters('platform').systemPrefix,'-kv-',parameters('platform').environment,'-',parameters('platform').region,'-01')]",
-        "pepNicName": "[concat('nic-',parameters('platform').systemPrefix,'-kv-',parameters('platform').environment,'-',parameters('platform').region,'-01')]"
-
+        "pepName": "[concat('pep-',parameters('platform').systemPrefix,'-kv-',parameters('platform').environment)]",
+        "pepNicName": "[concat('nic-',parameters('platform').systemPrefix,'-kv-',parameters('platform').environment)]"
     },
     "resources": [
         {
             "type": "Microsoft.KeyVault/vaults",
-            "apiVersion": "2021-10-01",
+            "apiVersion": "2022-07-01",
             "name": "[parameters('keyVault').name]",
             "location": "[parameters('platform').region]",
             "properties": {
@@ -36,27 +34,15 @@
                     "bypass": "AzureServices",
                     "defaultAction": "Deny",
                     "ipRules": [],
-                    "virtualNetworkRules": [
-/*
-                        {
-                            "id": "[concat(parameters('virtualnetworks_vnet_ais_dev_uksouth_01_externalid'), '/subnets/snet-ais-frontend-dev-uksouth-01')]",
-                            "ignoreMissingVnetServiceEndpoint": false
-                        },
-                        {
-                            "id": "[concat(parameters('virtualnetworks_vnet_ais_dev_uksouth_01_externalid'), '/subnets/snet-ais-backend-dev-uksouth-01')]",
-                            "ignoreMissingVnetServiceEndpoint": false
-                        }
-*/
-                    ]
+                    "virtualNetworkRules": []
                 }
-
             }
         },
         {
             "location": "[parameters('platform').region]",
             "name": "[variables('pepName')]",
             "type": "Microsoft.Network/privateEndpoints",
-            "apiVersion": "2021-05-01",
+            "apiVersion": "2022-05-01",
             "properties": {
                 "subnet": {
                     "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('vnet').name, parameters('vnet').privateLink.name)]"
@@ -67,7 +53,9 @@
                         "name": "[variables('pepName')]",
                         "properties": {
                             "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults',parameters('keyVault').name)]",
-                            "groupIds": [ "vault" ]
+                            "groupIds": [
+                                "vault"
+                            ]
                         }
                     }
                 ]
@@ -75,7 +63,6 @@
             "tags": {},
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults',parameters('keyVault').name)]"
-
             ]
         }
     ]

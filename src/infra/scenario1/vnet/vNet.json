@@ -4,7 +4,10 @@
 	"parameters": {
 		"vNet":{
 			"type": "object"
-		}
+		},
+		"platform": {
+            "type": "object"
+        }
 	},
 	"variables": {
 	},
@@ -13,7 +16,7 @@
 			"apiVersion": "2015-06-15",
 			"type": "Microsoft.Network/networkSecurityGroups",
 			"name": "[parameters('vNet').frontEnd.nsg]",
-			"location": "[resourceGroup().location]",
+			"location": "[parameters('platform').region]",
 			"tags": {
 				"displayName": "NSG - Remote Access"
 			},
@@ -54,7 +57,7 @@
 			"apiVersion": "2015-06-15",
 			"type": "Microsoft.Network/networkSecurityGroups",
 			"name": "[parameters('vNet').backEnd.nsg]",
-			"location": "[resourceGroup().location]",
+			"location": "[parameters('platform').region]",
 			"tags": {
 				"displayName": "NSG - Front End"
 			},
@@ -95,7 +98,7 @@
 			"apiVersion": "2015-06-15",
 			"type": "Microsoft.Network/virtualNetworks",
 			"name": "[parameters('vNet').name]",
-			"location": "[resourceGroup().location]",
+			"location": "[parameters('platform').region]",
 			"dependsOn": [
 				"[concat('Microsoft.Network/networkSecurityGroups/', parameters('vNet').frontEnd.nsg)]",
 				"[concat('Microsoft.Network/networkSecurityGroups/', parameters('vNet').backEnd.nsg)]"

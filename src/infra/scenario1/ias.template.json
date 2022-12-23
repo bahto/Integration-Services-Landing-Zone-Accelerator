@@ -19,35 +19,35 @@
         },
         "vnetAddressSpace": {
             "type": "string",
-            "defaultValue": "192.168.0.0/16",
+            "defaultValue": "10.1.0.0/16",
             "metadata": {
                 "description": "CIDR prefix for the VNet address space."
             }
         },
         "frontEndSubnet": {
             "type": "string",
-            "defaultValue": "192.168.1.0/24",
+            "defaultValue": "10.1.1.0/24",
             "metadata": {
                 "description": "CIDR address prefix for the front end subnet."
             }
         },
         "backEndSubnet": {
             "type": "string",
-            "defaultValue": "192.168.2.0/24",
+            "defaultValue": "10.1.2.0/24",
             "metadata": {
                 "description": "CIDR address prefix for the back end subnet."
             }
         },
         "privateLinkSubnet": {
             "type": "string",
-            "defaultValue": "192.168.10.0/24",
+            "defaultValue": "10.1.10.0/24",
             "metadata": {
                 "description": "CIDR address prefix for the private link."
             }
         },
         "VMSubnet": {
             "type": "string",
-            "defaultValue": "192.168.20.0/24",
+            "defaultValue": "10.1.20.0/24",
             "metadata": {
                 "description": "CIDR address prefix for the IaaS VM's."
             }
@@ -75,10 +75,10 @@
             "region": "[resourceGroup().location]"
         },
 
-        "nameSuffix": "[concat('-',parameters('systemPrefix'),'-',parameters('environment'),'-',variables('platform').region,'-01')]",
-
+        "nameSuffix": "[concat('-',parameters('systemPrefix'),'-',parameters('environment'))]",
+        
         "storage": {
-            "name": "[concat('stg',variables('platform').systemPrefix, variables('platform').environment,uniqueString(resourceGroup().id))]"
+            "name": "[concat('stg',variables('platform').systemPrefix, variables('platform').environment,'-',uniqueString(resourceGroup().id))]"
         },
         "logicApp": {
             "name": "[concat('logic',variables('nameSuffix'))]"
@@ -106,12 +106,10 @@
             "name": "[concat('apim',variables('nameSuffix'))]",
             "tier": "Developer",
             "capacity": "1",
-            "identity": "None",
             "adminEmail": "[parameters('apimAdminEmail')]",
             "organisation": "[parameters('apimOrganisation')]"
 
         },
-
         "serviceBus": {
             "name": "[concat('sbus',variables('nameSuffix'))]",
             "sku": "Premium"
@@ -122,21 +120,21 @@
             "name": "[concat('vnet',variables('nameSuffix'))]",
             "address": "[parameters('vnetAddressSpace')]",
             "frontEnd": {
-                "name": "[concat('snet-',parameters('systemPrefix'),'-frontend-',parameters('environment'),'-',variables('platform').region,'-01')]",
-                "nsg": "[concat('nsg-',parameters('systemPrefix'),'-frontend-',parameters('environment'),'-',variables('platform').region,'-01')]",
+                "name": "[concat('snet-',parameters('systemPrefix'),'-frontend-',parameters('environment'))]",
+                "nsg": "[concat('nsg-',parameters('systemPrefix'),'-frontend-',parameters('environment'))]",
                 "address": "[parameters('frontEndSubnet')]"
             },
             "backEnd": {
-                "name": "[concat('snet-',parameters('systemPrefix'),'-backend-',parameters('environment'),'-',variables('platform').region,'-01')]",
-                "nsg": "[concat('nsg-',parameters('systemPrefix'),'-backend-',parameters('environment'),'-',variables('platform').region,'-01')]",
+                "name": "[concat('snet-',parameters('systemPrefix'),'-backend-',parameters('environment')]",
+                "nsg": "[concat('nsg-',parameters('systemPrefix'),'-backend-',parameters('environment'))]",
                 "address": "[parameters('backEndSubnet')]"
             },
             "privateLink": {
-                "name": "[concat('snet-',parameters('systemPrefix'),'-privatelink-',parameters('environment'),'-',variables('platform').region,'-01')]",
+                "name": "[concat('snet-',parameters('systemPrefix'),'-privatelink-',parameters('environment'))]",
                 "address": "[parameters('privateLinkSubnet')]"
             },
             "VM": {
-                "name": "[concat('snet-',parameters('systemPrefix'),'-vm-',parameters('environment'),'-',variables('platform').region,'-01')]",
+                "name": "[concat('snet-',parameters('systemPrefix'),'-vm-',parameters('environment'))]",
                 "address": "[parameters('VMSubnet')]"
             }
         }
@@ -189,9 +187,10 @@
                 "parameters": {
                     "vNet": {
                         "value": "[variables('vNet')]"
+                    },
+                    "platform": {
+                        "value": "[variables('platform')]"
                     }
-
-
                 }
             }
         },
