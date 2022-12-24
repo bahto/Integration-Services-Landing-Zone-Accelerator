@@ -17,7 +17,7 @@
         "pepName": "[concat('pep-',parameters('platform').systemPrefix,'-sbus-',parameters('platform').environment)]",
         "pepNicName": "[concat('nic-',parameters('platform').systemPrefix,'-sbus-',parameters('platform').environment)]",
 
-		// Sample Queues & topics
+		// Sample Queues & topics & subscriptions
 		"queues": {
             "type": "array",
             "defaultValue": [
@@ -33,6 +33,19 @@
             "defaultValue": [
                 "SampleT1",
                 "SampleT2"
+            ]
+        },
+		"subscriptions": {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "topic": "SampleT1",
+                    "subscription": "SampleAppTopic1Subcriber"
+                },
+				{
+                    "topic": "SampleT2",
+                    "subscription": "SampleAppTopic2Subcriber"
+                }
             ]
         }
 
@@ -97,13 +110,13 @@
 		{
             "type": "Microsoft.ServiceBus/namespaces/queues",
             "apiVersion": "2021-11-01",
-            "name": "[concat(parameters('serviceBus').name, '/', if(contains(parameters('queues')[copyIndex()], 'name'), parameters('queues')[copyIndex()].name, parameters('queues')[copyIndex()]))]",
+            "name": "[concat(parameters('serviceBus').name, '/', if(contains(variables('queues')[copyIndex()], 'name'), variables('queues')[copyIndex()].name, variables('queues')[copyIndex()]))]",
             "location": "[parameters('platform').region]",
             "dependsOn": [
                 "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBus').name)]"
             ],
             "properties": {
-                "lockDuration": "[if(contains(parameters('queues')[copyIndex()], 'lockDuration'), parameters('queues')[copyIndex()].lockDuration, 'PT3M')]",
+                "lockDuration": "[if(contains(variables('queues')[copyIndex()], 'lockDuration'), variables('queues')[copyIndex()].lockDuration, 'PT3M')]",
                 "maxSizeInMegabytes": 1024,
                 "requiresDuplicateDetection": false,
                 "requiresSession": false,
@@ -118,7 +131,54 @@
             },
             "copy": {
                 "name": "queueCopy",
-                "count": "[length(parameters('queues'))]"
+                "count": "[length(variables('queues'))]"
+            }
+        },
+		{
+            "type": "Microsoft.ServiceBus/namespaces/topics",
+            "apiVersion": "2021-11-01",
+            "name": "[concat(parameters('serviceBus').name, '/', variables('topics')[copyIndex()])]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBus').name)]"
+            ],
+            "properties": {
+                "defaultMessageTimeToLive": "P365D",
+                "duplicateDetectionHistoryTimeWindow": "PT10M",
+                "enableBatchedOperations": false,
+                "enableExpress": true,
+                "enablePartitioning": false,
+                "maxSizeInMegabytes": 1024,
+                "requiresDuplicateDetection": false,
+                "status": "Active",
+                "supportOrdering": true
+            },
+            "copy": {
+                "name": "topicCopy",
+                "count": "[length(variables('topics'))]"
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/topics/subscriptions",
+            "apiVersion": "2021-11-01",
+            "name": "[concat(parameters('serviceBus').name, '/', variables('subscriptions')[copyIndex()].topic, '/', variables('subscriptions')[copyIndex()].subscription)]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces/topics', parameters('serviceBus').name, variables('subscriptions')[copyIndex()].topic)]",
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBus').name)]"
+            ],
+            "properties": {
+                "autoDeleteOnIdle": "P365D",
+                "deadLetteringOnFilterEvaluationExceptions": false,
+                "deadLetteringOnMessageExpiration": false,
+                "defaultMessageTimeToLive": "P14D",
+                "enableBatchedOperations": true,
+                "lockDuration": "PT5M",
+                "maxDeliveryCount": 10,
+                "requiresSession": false,
+                "status": "Active"
+            },
+            "copy": {
+                "name": "subscriptionCopy",
+                "count": "[length(variables('subscriptions'))]"
             }
         }
 	]
