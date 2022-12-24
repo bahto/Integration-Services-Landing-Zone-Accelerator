@@ -15,7 +15,26 @@
 	},
 	 "variables": {
         "pepName": "[concat('pep-',parameters('platform').systemPrefix,'-sbus-',parameters('platform').environment)]",
-        "pepNicName": "[concat('nic-',parameters('platform').systemPrefix,'-sbus-',parameters('platform').environment)]"
+        "pepNicName": "[concat('nic-',parameters('platform').systemPrefix,'-sbus-',parameters('platform').environment)]",
+
+		// Sample Queues & topics
+		"queues": {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "name": "SampleQ1",
+                    "lockDuration": "PT5M"
+                },
+                "SampleQ2"
+            ]
+        },
+		"topics": {
+            "type": "array",
+            "defaultValue": [
+                "SampleT1",
+                "SampleT2"
+            ]
+        }
 
     },
 	"resources": [
@@ -74,6 +93,33 @@
                 "[resourceId('Microsoft.ServiceBus/namespaces',parameters('serviceBus').name)]"
 
             ]
+        },
+		{
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "apiVersion": "2021-11-01",
+            "name": "[concat(parameters('serviceBus').name, '/', if(contains(parameters('queues')[copyIndex()], 'name'), parameters('queues')[copyIndex()].name, parameters('queues')[copyIndex()]))]",
+            "location": "[parameters('platform').region]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBus').name)]"
+            ],
+            "properties": {
+                "lockDuration": "[if(contains(parameters('queues')[copyIndex()], 'lockDuration'), parameters('queues')[copyIndex()].lockDuration, 'PT3M')]",
+                "maxSizeInMegabytes": 1024,
+                "requiresDuplicateDetection": false,
+                "requiresSession": false,
+                "defaultMessageTimeToLive": "P14D",
+                "deadLetteringOnMessageExpiration": true,
+                "enableBatchedOperations": true,
+                "duplicateDetectionHistoryTimeWindow": "PT10M",
+                "maxDeliveryCount": 10,
+                "status": "Active",
+                "enablePartitioning": false,
+                "enableExpress": false
+            },
+            "copy": {
+                "name": "queueCopy",
+                "count": "[length(parameters('queues'))]"
+            }
         }
 	]
 }
