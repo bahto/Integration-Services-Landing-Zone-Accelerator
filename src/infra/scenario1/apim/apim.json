@@ -13,7 +13,11 @@
     }
   },
   "functions": [],
-  "variables": {"subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnet').name, parameters('vnet').apim.name)]"},
+  "variables": {
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnet').name, parameters('vnet').apim.name)]",
+        "pepName": "[concat('pep-',parameters('platform').systemPrefix,'-apim-',parameters('platform').environment)]",
+        "pepNicName": "[concat('nic-',parameters('platform').systemPrefix,'-apim-',parameters('platform').environment)]"
+    },
   "resources": [
     {
       "type": "Microsoft.ApiManagement/service",
@@ -48,10 +52,35 @@
           "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Backend.Protocols.Ssl30": "false",
           "Microsoft.WindowsAzure.ApiManagement.Gateway.Protocols.Server.Http2": "false"
         }
-      },
-      "resources": [],
-      "dependsOn": []
-    }
+      }
+    },
+    {
+            "location": "[parameters('platform').region]",
+            "name": "[variables('pepName')]",
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2022-05-01",
+            "properties": {
+                "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('vnet').name, parameters('vnet').privateLink.name)]"
+                },
+                "customNetworkInterfaceName": "[variables('pepNicName')]",
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[variables('pepName')]",
+                        "properties": {
+                            "privateLinkServiceId": "[resourceId('Microsoft.ApiManagement/service',parameters('apim').name)]",
+                            "groupIds": [
+                                "vault"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service',parameters('apim').name)]"
+            ]
+        }
   ],
   "outputs": {}
 }
