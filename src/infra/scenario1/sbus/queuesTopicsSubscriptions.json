@@ -2,22 +2,12 @@
 	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
-		"serviceBus": {
-			"type": "object"
-		},		
-		"vNet": {
-            "type": "object"
-        },
-        "platform": {
-            "type": "object"
-        }
+		"serviceBusName": {
+			"type": "string"
+		}
 		
 	},
 	 "variables": {
-        "pepName": "[concat('pep-',parameters('platform').systemPrefix,'-sbus-',parameters('platform').environment)]",
-        "pepNicName": "[concat('nic-',parameters('platform').systemPrefix,'-sbus-',parameters('platform').environment)]",
-
-		// Sample Queues & topics & subscriptions
 		"queues": {
             "type": "array",
             "defaultValue": [
@@ -52,68 +42,12 @@
     },
 	"resources": [
 		{
-			"type": "Microsoft.ServiceBus/namespaces",
-			"apiVersion": "2021-11-01",
-			"name": "[parameters('serviceBus').name]",
-			"location": "[parameters('platform').region]",
-			"sku": {
-				"name": "[parameters('serviceBus').sku]"				
-			},
-			"properties": {
-				"publicNetworkAccess": "Disabled",
-				"disableLocalAuth": false,
-				"zoneRedundant": false
-			}
-		},
-		{
-			"type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
-			"apiVersion": "2021-11-01",
-			"name": "[concat(parameters('serviceBus').name, '/RootManageSharedAccessKey')]",
-			"location": "[parameters('platform').region]",
-			"dependsOn": [
-				"[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBus').name)]"
-			],
-			"properties": {
-				"rights": [
-					"Listen",
-					"Manage",
-					"Send"
-				]
-			}
-		},
-		{
-            "location": "[parameters('platform').region]",
-            "name": "[variables('pepName')]",
-            "type": "Microsoft.Network/privateEndpoints",
-            "apiVersion": "2022-05-01",
-            "properties": {
-                "subnet": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',parameters('vnet').name, parameters('vnet').privateLink.name)]"
-                },
-                "customNetworkInterfaceName": "[variables('pepNicName')]",
-                "privateLinkServiceConnections": [
-                    {
-                        "name": "[variables('pepName')]",
-                        "properties": {
-                            "privateLinkServiceId": "[resourceId('Microsoft.ServiceBus/namespaces',parameters('serviceBus').name)]",
-                            "groupIds": [ "namespace" ]
-                        }
-                    }
-                ]
-            },
-            "tags": {},
-            "dependsOn": [
-                "[resourceId('Microsoft.ServiceBus/namespaces',parameters('serviceBus').name)]"
-
-            ]
-        },
-		{
             "type": "Microsoft.ServiceBus/namespaces/queues",
             "apiVersion": "2021-11-01",
-            "name": "[concat(parameters('serviceBus').name, '/', if(contains(variables('queues')[copyIndex()], 'name'), variables('queues')[copyIndex()].name, variables('queues')[copyIndex()]))]",
+            "name": "[concat(parameters('serviceBusName'), '/', if(contains(variables('queues')[copyIndex()], 'name'), variables('queues')[copyIndex()].name, variables('queues')[copyIndex()]))]",
             "location": "[parameters('platform').region]",
             "dependsOn": [
-                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBus').name)]"
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
             ],
             "properties": {
                 "lockDuration": "[if(contains(variables('queues')[copyIndex()], 'lockDuration'), variables('queues')[copyIndex()].lockDuration, 'PT3M')]",
@@ -137,9 +71,9 @@
 		{
             "type": "Microsoft.ServiceBus/namespaces/topics",
             "apiVersion": "2021-11-01",
-            "name": "[concat(parameters('serviceBus').name, '/', variables('topics')[copyIndex()])]",
+            "name": "[concat(parameters('serviceBusName'), '/', variables('topics')[copyIndex()])]",
             "dependsOn": [
-                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBus').name)]"
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
             ],
             "properties": {
                 "defaultMessageTimeToLive": "P365D",
@@ -160,10 +94,10 @@
         {
             "type": "Microsoft.ServiceBus/namespaces/topics/subscriptions",
             "apiVersion": "2021-11-01",
-            "name": "[concat(parameters('serviceBus').name, '/', variables('subscriptions')[copyIndex()].topic, '/', variables('subscriptions')[copyIndex()].subscription)]",
+            "name": "[concat(parameters('serviceBusName'), '/', variables('subscriptions')[copyIndex()].topic, '/', variables('subscriptions')[copyIndex()].subscription)]",
             "dependsOn": [
-                "[resourceId('Microsoft.ServiceBus/namespaces/topics', parameters('serviceBus').name, variables('subscriptions')[copyIndex()].topic)]",
-                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBus').name)]"
+                "[resourceId('Microsoft.ServiceBus/namespaces/topics', parameters('serviceBusName'), variables('subscriptions')[copyIndex()].topic)]",
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
             ],
             "properties": {
                 "autoDeleteOnIdle": "P365D",

@@ -95,13 +95,44 @@
 			}
 		},
 		{
+			"apiVersion": "2022-05-01",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"name": "[parameters('vNet').apim.nsg]",
+			"location": "[parameters('platform').region]",
+			"tags": {
+				"displayName": "NSG - API-Management"
+			},
+			"properties": {
+				"securityRules": [
+					{
+						"name": "AllowAnyHTTPSInbound",
+						"properties": {
+							"protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 210,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+						}
+					}
+				]
+			}
+		},
+		{
 			"apiVersion": "2015-06-15",
 			"type": "Microsoft.Network/virtualNetworks",
 			"name": "[parameters('vNet').name]",
 			"location": "[parameters('platform').region]",
 			"dependsOn": [
 				"[concat('Microsoft.Network/networkSecurityGroups/', parameters('vNet').frontEnd.nsg)]",
-				"[concat('Microsoft.Network/networkSecurityGroups/', parameters('vNet').backEnd.nsg)]"
+				"[concat('Microsoft.Network/networkSecurityGroups/', parameters('vNet').backEnd.nsg)]",
+				"[concat('Microsoft.Network/networkSecurityGroups/', parameters('vNet').apim.nsg)]"
 				
 				
 			],
@@ -130,6 +161,15 @@
 							"addressPrefix": "[parameters('vNet').backEnd.address]",
 							"networkSecurityGroup": {
 								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('vNet').backEnd.nsg)]"
+							}
+						}
+					},
+					{
+						"name": "[parameters('vNet').apim.name]",
+						"properties": {
+							"addressPrefix": "[parameters('vNet').apim.address]",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('vNet').apim.nsg)]"
 							}
 						}
 					},
