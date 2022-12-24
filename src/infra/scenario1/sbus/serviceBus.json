@@ -5,8 +5,10 @@
 		"serviceBus": {
 			"type": "object",
 			"defaultValue": {
-            "name": "SampleNameServicebusInstance"
-        }
+				{
+            		"name": "SampleNameServicebusInstance"
+				}
+        	}
 		},		
 		"vNet": {
             "type": "object"
