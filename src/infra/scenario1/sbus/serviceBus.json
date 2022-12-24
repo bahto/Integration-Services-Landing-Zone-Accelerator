@@ -3,7 +3,10 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"serviceBus": {
-			"type": "object"
+			"type": "object",
+			"defaultValue": {
+            "name": "SampleNameServicebusInstance"
+        }
 		},		
 		"vNet": {
             "type": "object"
