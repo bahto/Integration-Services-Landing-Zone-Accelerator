@@ -70,7 +70,7 @@
                         "properties": {
                             "privateLinkServiceId": "[resourceId('Microsoft.ApiManagement/service',parameters('apim').name)]",
                             "groupIds": [
-                                "vault"
+                                "Gateway"
                             ]
                         }
                     }
